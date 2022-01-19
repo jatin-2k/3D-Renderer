@@ -1,5 +1,8 @@
-output.tga
-a.out
 .DS_Store
+
+output.tga
+main
+*.o
+
 tinyrenderer/
 .vscode/
