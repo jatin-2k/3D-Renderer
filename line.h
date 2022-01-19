@@ -1,7 +1,7 @@
 #ifndef _LINE_H
 #define _LINE_H
 
-#include "tgaimage.h"
+#include "provided/code/tgaimage.h"
 
 //Function Declerations
 int diagonalDis(int x0, int y0, int x1, int y1);

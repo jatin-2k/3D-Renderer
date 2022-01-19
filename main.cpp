@@ -1,4 +1,4 @@
-#include "tgaimage.h"
+#include "provided/code/tgaimage.h"
 #include "line.h"
 
 const TGAColor white = TGAColor(255, 255, 255, 255);
@@ -6,7 +6,7 @@ const TGAColor red   = TGAColor(255, 0,   0,   255);
 
 int main(int argc, char** argv) {
 	TGAImage image(100, 100, TGAImage::RGB);
-	optLine(13, 20, 80, 40, image, red, diagonalDis(13, 20, 80, 40));
+	optLine(0, 50, 100, 00, image, red, diagonalDis(13, 20, 80, 40));
 	//line(20, 13, 40, 80, image, red); 
 	//line(80, 40, 13, 100, image, red);
 

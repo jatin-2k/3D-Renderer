@@ -1,6 +1,6 @@
 #include <math.h>
 #include <iostream>
-#include "tgaimage.h"
+#include "provided/code/tgaimage.h"
 
 int diagonalDis(int x0, int y0, int x1, int y1){
 	return sqrt((x1-x0)*(x1-x0) + (y1-y0)*(y1-y0));
