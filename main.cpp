@@ -6,7 +6,10 @@ const TGAColor red   = TGAColor(255, 0,   0,   255);
 
 int main(int argc, char** argv) {
 	TGAImage image(100, 100, TGAImage::RGB);
-	walkLine(100, 100, 0, 0, image, white);
+	supercoverLine(20, 0, 50, 80, image, white);
+	walkLine(0, 0, 100, 30, image, white);
+	optLine(0, 20, 80, 60, image, white);
+
 	//line(20, 13, 40, 80, image, red); 
 	//line(80, 40, 13, 100, image, red);
 

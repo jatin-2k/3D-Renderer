@@ -46,3 +46,27 @@ void walkLine(int x0, int y0, int x1, int y1, TGAImage &img, TGAColor colour){
 		img.set(px,py,colour);
 	}
 }
+
+void supercoverLine(int x0, int y0, int x1, int y1, TGAImage &img, TGAColor colour){
+	int dx = x1-x0, dy = y1-y0; //diplacement
+	int nx = abs(dx), ny = abs(dy); //number of points
+	int sign_x = (dx>0)?1:-1 , sign_y = (dy>0)?1:-1;
+	int px = x0, py = y0;
+	for(int ix=0, iy=0; ix<nx || iy<ny; ){
+		//(0.5 + ix)/nx - (0.5 + iy)/ny
+		float decision = (1 + 2*ix) * ny - (1 + 2*iy) * nx;
+		if(decision == 0){
+			px += sign_x; py += sign_y;
+			ix++; iy++;
+		}
+		if(decision < 0){
+			px = px + sign_x;
+			ix++;
+		}
+		if(decision > 0){
+			py = py + sign_y;
+			iy++;
+		}
+		img.set(px,py,colour);
+	}
+}
