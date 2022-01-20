@@ -5,6 +5,7 @@
 
 //Function Declerations
 int diagonalDis(int x0, int y0, int x1, int y1);
+void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color);
 void unoptLine(int x0, int y0, int x1, int y1, TGAImage &img, TGAColor colour);
 void optLine(int x0, int y0, int x1, int y1, TGAImage &img, TGAColor colour);
 void walkLine(int x0, int y0, int x1, int y1, TGAImage &img, TGAColor colour);
