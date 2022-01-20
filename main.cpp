@@ -1,50 +1,44 @@
 #include "provided/code/tgaimage.h"
+#include "provided/code/geometry.h"
 #include "line.h"
+#include "model.h"
 #include <curses.h>
 #include <iostream>
 
+//Variables
 const TGAColor white = TGAColor(255, 255, 255, 255);
 const TGAColor black = TGAColor(  0,   0,   0,   0);
 const TGAColor red   = TGAColor(255,   0,   0, 255);
+Model *model = NULL;
+const int width  = 800;
+const int height = 800;
 
+//Functions
+void inputModel(int argc, char** argv);
 int main(int argc, char** argv) {
-	TGAImage image(1000, 1000, TGAImage::RGB);
 	initscr();
 	cbreak();
 
 	char c;
-	int x0 = 40, y0 = 20, x1 = 80, y1 = 80;
-	supercoverLine(x0,y0,x1,y1,image,white);
-	image.flip_vertically();
-	image.write_tga_file("output.tga");
+	TGAImage image(width, height, TGAImage::RGB);
+
+	inputModel(argc, argv);
 	while(1){
 		c = getch();
 		system("clear");
 		if(c=='q') break;
-		image.flip_vertically();
-		supercoverLine(x0,y0,x1,y1,image,black);
-		switch (c)
-		{
-		case 'w': y0+=20; break;
-		case 's': y0-=20; break;
-		case 'a': x0-=20; break;
-		case 'd': x0+=20; break;
-		case 'i': y1+=20; break;
-		case 'k': y1-=20; break;
-		case 'j': x1-=20; break;
-		case 'l': x1+=20; break;
-		default:
-			break;
-		}
-		std::cout<<"drawn:"<<x0<<" "<<y0<<" "<<x1<<" "<<y1<<std::endl;
-		supercoverLine(x0,y0,x1,y1,image,white);
-		image.flip_vertically();
-		image.write_tga_file("output.tga");
+		//will write rotation code here
 	}
 
-	//image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
-	
 
 	endwin();
 	return 0;
+}
+
+void inputModel(int argc, char** argv){
+	if (2==argc) {
+        model = new Model(argv[1]);
+    } else {
+        model = new Model("./provided/obj/african_head.obj");
+    }
 }
