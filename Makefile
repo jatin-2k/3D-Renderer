@@ -1,6 +1,6 @@
 SYSCONF_LINK = g++
 CPPFLAGS     =
-LDFLAGS      =
+LDFLAGS      = -lncurses 
 LIBS         = -lm
 
 DESTDIR = ./
