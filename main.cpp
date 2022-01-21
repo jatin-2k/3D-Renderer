@@ -17,7 +17,8 @@ const int height = IMG_HEIGHT;
 
 //Functions
 void inputModel(int argc, char** argv);
-void draw(TGAImage &image);
+void drawWireFrameOn(TGAImage &image);
+void drawFlatShadingRenderOn(TGAImage &image);
 void render(TGAImage &image);
 
 int main(int argc, char** argv) {
@@ -27,8 +28,8 @@ int main(int argc, char** argv) {
 	char c;
 	TGAImage image(width, height, TGAImage::RGB);
 
-	Vec2i pts[3] = {Vec2i(10,10), Vec2i(100, 30), Vec2i(190, 160)}; 
-    triangle(pts, image, red); 
+	inputModel(argc,argv);
+	drawFlatShadingRenderOn(image);
 	render(image);
 	while(1){
 		c = getch();
@@ -50,7 +51,7 @@ void inputModel(int argc, char** argv){
     }
 }
 
-void draw(TGAImage &image){
+void drawWireFrameOn(TGAImage &image){
     for (int i=0; i<model->nfaces(); i++) {
         std::vector<int> face = model->face(i);
         for (int j=0; j<3; j++) {
@@ -63,6 +64,18 @@ void draw(TGAImage &image){
             line(x0, y0, x1, y1, image, white);
         }
     }
+}
+
+void drawFlatShadingRenderOn(TGAImage &image){
+	for (int i=0; i<model->nfaces(); i++) { 
+		std::vector<int> face = model->face(i); 
+		Vec2i screen_coords[3]; 
+		for (int j=0; j<3; j++) { 
+			Vec3f world_coords = model->vert(face[j]); 
+			screen_coords[j] = Vec2i((world_coords.x+1.)*width/2., (world_coords.y+1.)*height/2.); 
+		} 
+		triangle(screen_coords, image, TGAColor(rand()%255, rand()%255, rand()%255, 255)); 
+	}
 }
 
 void render(TGAImage &image){
