@@ -8,36 +8,44 @@ void OldSchooltriangle(Vec2i t0, Vec2i t1, Vec2i t2, TGAImage &image, TGAColor c
     for (int y=t0.y; y<=t1.y; y++) { 
         int segment_height = t1.y-t0.y+1; 
         float alpha = (float)(y-t0.y)/total_height; 
-        float beta  = (float)(y-t0.y)/segment_height; // be careful with divisions by zero 
+        float beta  = (float)(y-t0.y)/segment_height; // div by 0
         Vec2i A = t0 + (t2-t0)*alpha; 
         Vec2i B = t0 + (t1-t0)*beta; 
         if (A.x>B.x) std::swap(A, B); 
         for (int j=A.x; j<=B.x; j++) { 
-            image.set(j, y, color); // attention, due to int casts t0.y+i != A.y 
+            image.set(j, y, color); 
         } 
     } 
     for (int y=t1.y; y<=t2.y; y++) { 
         int segment_height =  t2.y-t1.y+1; 
         float alpha = (float)(y-t0.y)/total_height; 
-        float beta  = (float)(y-t1.y)/segment_height; // be careful with divisions by zero 
+        float beta  = (float)(y-t1.y)/segment_height; // div by 0
         Vec2i A = t0 + (t2-t0)*alpha; 
         Vec2i B = t1 + (t2-t1)*beta; 
         if (A.x>B.x) std::swap(A, B); 
         for (int j=A.x; j<=B.x; j++) { 
-            image.set(j, y, color); // attention, due to int casts t0.y+i != A.y 
+            image.set(j, y, color);
         } 
     } 
 }
 
 Vec3f cross(const Vec3f &v1, const Vec3f &v2) {
-    return Vec3f(v1.y*v2.z - v1.z*v2.y, v1.z*v2.x - v1.x*v2.z, v1.x*v2.y - v1.y*v2.x);
+    return Vec3f(v1.y*v2.z - v1.z*v2.y, 
+                 v1.z*v2.x - v1.x*v2.z, 
+                 v1.x*v2.y - v1.y*v2.x);
 }
 
 Vec3f barycentric(Vec2i *pts, Vec2i P) { 
-    Vec3f u = cross(Vec3f(pts[2].x-pts[0].x, pts[1].x-pts[0].x, pts[0].x-P.x), Vec3f(pts[2].y-pts[0].y, pts[1].y-pts[0].y, pts[0].y-P.y));
+    Vec3f u = cross(Vec3f(pts[2].x-pts[0].x, 
+                          pts[1].x-pts[0].x, 
+                          pts[0].x-P.x), 
+                    Vec3f(pts[2].y-pts[0].y, 
+                          pts[1].y-pts[0].y, 
+                          pts[0].y-P.y));
     /* `pts` and `P` has integer value as coordinates
        so `abs(u[2])` < 1 means `u[2]` is 0, that means
-       triangle is degenerate, in this case return something with negative coordinates */
+       triangle is degenerate, 
+       in this case returning something with negative coordinates */
     if (std::abs(u.z)<1) return Vec3f(-1,1,1);
     return Vec3f(1.f-(u.x+u.y)/u.z, u.y/u.z, u.x/u.z); 
 } 
