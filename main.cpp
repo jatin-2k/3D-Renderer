@@ -19,6 +19,7 @@ const int height = IMG_HEIGHT;
 void inputModel(int argc, char** argv);
 void drawWireFrameOn(TGAImage &image);
 void drawFlatShadingRenderOn(TGAImage &image);
+void drawShadedRenderOn(TGAImage &image);
 void render(TGAImage &image);
 
 int main(int argc, char** argv) {
@@ -29,7 +30,7 @@ int main(int argc, char** argv) {
 	TGAImage image(width, height, TGAImage::RGB);
 
 	inputModel(argc,argv);
-	drawFlatShadingRenderOn(image);
+	drawShadedRenderOn(image);
 	render(image);
 	while(1){
 		c = getch();
@@ -76,6 +77,28 @@ void drawFlatShadingRenderOn(TGAImage &image){
 		} 
 		triangle(screen_coords, image, TGAColor(rand()%255, rand()%255, rand()%255, 255)); 
 	}
+}
+
+
+
+void drawShadedRenderOn(TGAImage &image){
+        for (int i=0; i<model->nfaces(); i++) { 
+        std::vector<int> face = model->face(i); 
+        Vec2i screen_coords[3]; 
+        Vec3f world_coords[3]; 
+        for (int j=0; j<3; j++) { 
+            Vec3f v = model->vert(face[j]); 
+            screen_coords[j] = Vec2i((v.x+1.)*width/2., (v.y+1.)*height/2.); 
+            world_coords[j]  = v; 
+        } 
+        Vec3f n = (world_coords[2]-world_coords[0])^(world_coords[1]-world_coords[0]); 
+        Vec3f light_dir(0,0,-1);
+        n.normalize(); 
+        float intensity = n*light_dir; 
+        if (intensity>0) { 
+            triangle(screen_coords, image, TGAColor(intensity*255, intensity*255, intensity*255, 255)); 
+        } 
+    }
 }
 
 void render(TGAImage &image){
