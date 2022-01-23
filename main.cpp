@@ -44,6 +44,7 @@ int main(int argc, char** argv) {
 	return 0;
 }
 
+#pragma region Function_Definations
 void inputModel(int argc, char** argv){
 	if (2==argc) {
         model = new Model(argv[1]);
@@ -105,3 +106,4 @@ void render(TGAImage &image){
 	image.flip_vertically();
 	image.write_tga_file("output.tga");
 }
+#pragma endregion
