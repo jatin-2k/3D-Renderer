@@ -80,16 +80,18 @@ void drawFlatShadingRenderOn(TGAImage &image){
 	}
 }
 
-
+Vec3f world2screen(Vec3f v){ return Vec3f(int((v.x+1.)*width/2.+.5), int((v.y+1.)*height/2.+.5), v.z);}
 
 void drawShadedRenderOn(TGAImage &image){
-        for (int i=0; i<model->nfaces(); i++) { 
+    float zbuffer[width*height];
+    memset(zbuffer, -std::numeric_limits<float>::max(),sizeof(zbuffer));
+    for (int i=0; i<model->nfaces(); i++) { 
         std::vector<int> face = model->face(i); 
-        Vec2i screen_coords[3]; 
+        Vec3f screen_coords[3]; 
         Vec3f world_coords[3]; 
         for (int j=0; j<3; j++) { 
             Vec3f v = model->vert(face[j]); 
-            screen_coords[j] = Vec2i((v.x+1.)*width/2., (v.y+1.)*height/2.); 
+            screen_coords[j] = world2screen(v);
             world_coords[j]  = v; 
         } 
         Vec3f n = (world_coords[2]-world_coords[0])^(world_coords[1]-world_coords[0]); 
@@ -97,7 +99,7 @@ void drawShadedRenderOn(TGAImage &image){
         n.normalize(); 
         float intensity = n*light_dir; 
         if (intensity>0) { 
-            triangle(screen_coords, image, TGAColor(intensity*255, intensity*255, intensity*255, 255)); 
+            triangle(screen_coords,zbuffer, image, TGAColor(intensity*255, intensity*255, intensity*255, 255)); 
         } 
     }
 }
