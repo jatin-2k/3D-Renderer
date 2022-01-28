@@ -28,6 +28,11 @@ Model::Model(const char *filename) : verts_(), faces_() {
                 f.push_back(idx);
             }
             faces_.push_back(f);
+        } else if (!line.compare(0, 4, "vt  ")){
+            iss >> trash;
+            Vec2f vt;
+            for(int i=0; i<2; i++) iss >> vt[i];
+            textures_.push_back(vt);
         }
     }
     std::cerr << "# v# " << verts_.size() << " f# "  << faces_.size() << std::endl;
@@ -40,6 +45,10 @@ int Model::nverts() {
     return (int)verts_.size();
 }
 
+int Model::ntextures() {
+    return (int)textures_.size();
+}
+
 int Model::nfaces() {
     return (int)faces_.size();
 }
@@ -50,4 +59,8 @@ std::vector<int> Model::face(int idx) {
 
 Vec3f Model::vert(int i) {
     return verts_[i];
+}
+
+Vec2f Model::texture(int i) {
+    return textures_[i];
 }

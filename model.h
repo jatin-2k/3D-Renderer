@@ -7,13 +7,16 @@
 class Model {
 private:
 	std::vector<Vec3f> verts_;
+	std::vector<Vec2f> textures_;
 	std::vector<std::vector<int> > faces_;
 public:
 	Model(const char *filename);
 	~Model();
 	int nverts();
+	int ntextures();
 	int nfaces();
 	Vec3f vert(int i);
+	Vec2f texture(int i);
 	std::vector<int> face(int idx);
 };
 
