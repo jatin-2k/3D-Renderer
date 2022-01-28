@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
 		//will write rotation code here
 	}
 
-
+    delete model;
 	endwin();
 	return 0;
 }
@@ -80,11 +80,13 @@ void drawFlatShadingRenderOn(TGAImage &image){
 	}
 }
 
-Vec3f world2screen(Vec3f v){ return Vec3f(int((v.x+1.)*width/2.+.5), int((v.y+1.)*height/2.+.5), v.z);}
+Vec3f world2screen(Vec3f v) {
+    return Vec3f(int((v.x+1.)*width/2.+.5), int((v.y+1.)*height/2.+.5), v.z);
+}
 
 void drawShadedRenderOn(TGAImage &image){
-    float zbuffer[width*height];
-    memset(zbuffer, -std::numeric_limits<float>::max(),sizeof(zbuffer));
+    float *zbuffer = new float[width*height];
+    for (int i=width*height; i--; zbuffer[i] = -std::numeric_limits<float>::max());
     for (int i=0; i<model->nfaces(); i++) { 
         std::vector<int> face = model->face(i); 
         Vec3f screen_coords[3]; 
