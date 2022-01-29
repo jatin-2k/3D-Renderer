@@ -21,11 +21,12 @@ Model::Model(const char *filename) : verts_(), faces_() {
             verts_.push_back(v);
         } else if (!line.compare(0, 2, "f ")) {
             std::vector<int> f;
-            int itrash, idx;
+            int itrash, idx, tidx;
             iss >> trash;
-            while (iss >> idx >> trash >> itrash >> trash >> itrash) {
+            while (iss >> idx >> trash >> tidx >> trash >> itrash) {
                 idx--; // in wavefront obj all indices start at 1, not zero
                 f.push_back(idx);
+                f.push_back(tidx);
             }
             faces_.push_back(f);
         } else if (!line.compare(0, 4, "vt  ")){
