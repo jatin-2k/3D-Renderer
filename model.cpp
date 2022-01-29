@@ -31,12 +31,13 @@ Model::Model(const char *filename) : verts_(), faces_() {
             faces_.push_back(f);
         } else if (!line.compare(0, 4, "vt  ")){
             iss >> trash;
+            iss >> trash;
             Vec2f vt;
             for(int i=0; i<2; i++) iss >> vt[i];
             textures_.push_back(vt);
         }
     }
-    std::cerr << "# v# " << verts_.size() << " f# "  << faces_.size() << std::endl;
+    std::cerr << "# v# " << verts_.size() << " f# "  << faces_.size() << " t#" << textures_.size() <<std::endl;
 }
 
 Model::~Model() {
