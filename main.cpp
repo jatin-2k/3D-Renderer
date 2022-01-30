@@ -63,7 +63,7 @@ void drawFlatShadingRenderOn(TGAImage &image){
         n.normalize(); 
         float intensity = n*light_dir; 
         if(intensity > 0)
-		OldSchooltriangle(screen_coords[0],screen_coords[1], screen_coords[2], texture_coords[0], texture_coords[1], texture_coords[2], image, model, zbuffer, intensity); 
+		triangle(screen_coords, texture_coords, zbuffer, image, model, intensity); 
 	}
 }
 

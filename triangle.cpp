@@ -37,41 +37,6 @@ Vec3f cross(const Vec3f &v1, const Vec3f &v2) {
                  v1.x*v2.y - v1.y*v2.x);
 }
 
-Vec3f barycentric(Vec2i *pts, Vec2i P) { 
-    Vec3f u = cross(Vec3f(pts[2].x-pts[0].x, 
-                          pts[1].x-pts[0].x, 
-                          pts[0].x-P.x), 
-                    Vec3f(pts[2].y-pts[0].y, 
-                          pts[1].y-pts[0].y, 
-                          pts[0].y-P.y));
-    /* `pts` and `P` has integer value as coordinates
-       so `abs(u[2])` < 1 means `u[2]` is 0, that means
-       triangle is degenerate, 
-       in this case returning something with negative coordinates */
-    if (std::abs(u.z)<1) return Vec3f(-1,1,1);
-    return Vec3f(1.f-(u.x+u.y)/u.z, u.y/u.z, u.x/u.z); 
-} 
- 
-void triangle(Vec2i *pts, TGAImage &image, TGAColor color) { 
-    Vec2i bboxmin(image.get_width()-1,  image.get_height()-1); 
-    Vec2i bboxmax(0, 0); 
-    Vec2i clamp(image.get_width()-1, image.get_height()-1); 
-    for (int i=0; i<3; i++) { 
-        bboxmin.x = std::max(0,       std::min(bboxmin.x, pts[i].x)); 
-        bboxmax.x = std::min(clamp.x, std::max(bboxmax.x, pts[i].x)); 
-        bboxmin.y = std::max(0,       std::min(bboxmin.y, pts[i].y)); 
-        bboxmax.y = std::min(clamp.y, std::max(bboxmax.y, pts[i].y)); 
-    } 
-    Vec2i P; 
-    for (P.x=bboxmin.x; P.x<=bboxmax.x; P.x++) { 
-        for (P.y=bboxmin.y; P.y<=bboxmax.y; P.y++) { 
-            Vec3f bc_screen  = barycentric(pts, P); 
-            if (bc_screen.x<0 || bc_screen.y<0 || bc_screen.z<0) continue; 
-            image.set(P.x, P.y, color); 
-        } 
-    } 
-} 
-
 Vec3f barycentric(Vec3f A, Vec3f B, Vec3f C, Vec3f P) {
     Vec3f s[2];
     for (int i=2; i--; ) {
@@ -85,39 +50,18 @@ Vec3f barycentric(Vec3f A, Vec3f B, Vec3f C, Vec3f P) {
     return Vec3f(-1,1,1); // in this case generate negative coordinates, it will be thrown away by the rasterizator
 }
 
-void triangle(Vec3f *pts,float *zbuffer, TGAImage &image, TGAColor color) { 
-    Vec2f bboxmin(image.get_width()-1,  image.get_height()-1); 
-    Vec2f bboxmax(0, 0); 
-    Vec2f clamp(image.get_width()-1, image.get_height()-1); 
-    for (int i=0; i<3; i++) {
-        for (int j=0; j<2; j++) {
-            bboxmin[j] = std::max(0.f,      std::min(bboxmin[j], pts[i][j]));
-            bboxmax[j] = std::min(clamp[j], std::max(bboxmax[j], pts[i][j]));
-        }
-    }
-    Vec3f P;
-    for (P.x=bboxmin.x; P.x<=bboxmax.x; P.x++) {
-        for (P.y=bboxmin.y; P.y<=bboxmax.y; P.y++) {
-            Vec3f bc_screen  = barycentric(pts[0], pts[1], pts[2], P);
-            if (bc_screen.x<0 || bc_screen.y<0 || bc_screen.z<0) continue;
-            P.z = 0;
-            for (int i=0; i<3; i++) P.z += pts[i][2]*bc_screen[i];
-            if (zbuffer[int(P.x+P.y*image.get_width())]<P.z) {
-                zbuffer[int(P.x+P.y*image.get_width())] = P.z;
-                image.set(P.x, P.y, color);
-            }
-        }
-    }
-} 
-
 Vec3f world2screen(Vec3f v, int width, int height) {
     return Vec3f(int((v.x+1.)*width/2.+.5), int((v.y+1.)*height/2.+.5), v.z);
 }
 
-void triangle(Vec3f *pts, Vec3f *wpts, Vec2f *texture_pts, float *zbuffer, TGAImage &image, TGAImage &texture, float &intensity) { 
-    Vec2f bboxmin(image.get_width()-1,  image.get_height()-1); 
+void triangle(Vec3f *pts, Vec2i *texture_pts, float *zbuffer, TGAImage &image, Model* &model, float &intensity) { 
+    int img_width = image.get_width();
+    int img_height = image.get_height();
+    int tex_width = model->diffusemap_width();
+    int tex_height = model->diffusemap_height();
+    Vec2f bboxmin(img_width-1,  img_height-1); 
     Vec2f bboxmax(0, 0); 
-    Vec2f clamp(image.get_width()-1, image.get_height()-1); 
+    Vec2f clamp(img_width-1, img_height-1); 
     for (int i=0; i<3; i++) {
         for (int j=0; j<2; j++) {
             bboxmin[j] = std::max(0.f,      std::min(bboxmin[j], pts[i][j]));
@@ -133,19 +77,14 @@ void triangle(Vec3f *pts, Vec3f *wpts, Vec2f *texture_pts, float *zbuffer, TGAIm
             for (int i=0; i<3; i++){
                 P.z += pts[i][2]*bc_screen[i];
             }
-            if (zbuffer[int(P.x+P.y*image.get_width())]<P.z) {
-                zbuffer[int(P.x+P.y*image.get_width())] = P.z;
-                //  xmn = std::min(xmn, bc_screen.x); 
-                //  ymn = std::min(ymn, bc_screen.y);
-                //  xmx = std::max(xmx, bc_screen.x);
-                //  ymx = std::max(ymx, bc_screen.y);
-                TGAColor color = texture.get(
-                    (texture_pts[0].x*texture.get_width())*bc_screen[0] + (texture_pts[1].x*texture.get_width())*bc_screen[1] + (texture_pts[2].x*texture.get_width())*bc_screen[2],
-                    (texture_pts[0].y*texture.get_height())*bc_screen[0] + (texture_pts[1].y*texture.get_height())*bc_screen[1] + (texture_pts[2].y*texture.get_height())*bc_screen[2]
+            if (zbuffer[int(P.x+P.y*img_width)]<P.z) {
+                zbuffer[int(P.x+P.y*img_width)] = P.z;
+                TGAColor color = model->diffuse(
+                    Vec2i((texture_pts[0].x)*bc_screen[0] + (texture_pts[1].x)*bc_screen[1] + (texture_pts[2].x)*bc_screen[2],
+                    (texture_pts[0].y)*bc_screen[0] + (texture_pts[1].y)*bc_screen[1] + (texture_pts[2].y)*bc_screen[2])
                 );
                 image.set(P.x, P.y, color);
             }
         }
     }
-    //std::cout<<xmn<<" "<<ymn<<" : "<<xmx<<" "<<ymx<<std::endl;
 }

@@ -21,6 +21,8 @@ public:
 	Vec3f vert(int i);
 	Vec2i uv(int iface, int nvert);
 	TGAColor diffuse(Vec2i uv);
+	int diffusemap_height(){ return diffusemap_.get_height(); }
+	int diffusemap_width(){ return diffusemap_.get_width(); }
 	std::vector<int> face(int idx);
 };
 
