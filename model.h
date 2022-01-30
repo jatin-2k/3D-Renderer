@@ -2,21 +2,25 @@
 #define __MODEL_H__
 
 #include <vector>
+#include "provided/code/tgaimage.h"
 #include "provided/code/geometry.h"
 
 class Model {
 private:
 	std::vector<Vec3f> verts_;
-	std::vector<Vec2f> textures_;
-	std::vector<std::vector<int> > faces_;
+	std::vector<std::vector<Vec3i> > faces_; // attention, this Vec3i means vertex/uv/normal
+	std::vector<Vec3f> norms_;
+	std::vector<Vec2f> uv_;
+	TGAImage diffusemap_;
+	void load_texture(std::string filename, const char *suffix, TGAImage &img);
 public:
 	Model(const char *filename);
 	~Model();
 	int nverts();
-	int ntextures();
 	int nfaces();
 	Vec3f vert(int i);
-	Vec2f texture(int i);
+	Vec2i uv(int iface, int nvert);
+	TGAColor diffuse(Vec2i uv);
 	std::vector<int> face(int idx);
 };
 
