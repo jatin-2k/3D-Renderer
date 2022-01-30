@@ -83,7 +83,7 @@ void triangle(Vec3f *pts, Vec2i *texture_pts, float *zbuffer, TGAImage &image, M
                     Vec2i((texture_pts[0].x)*bc_screen[0] + (texture_pts[1].x)*bc_screen[1] + (texture_pts[2].x)*bc_screen[2],
                     (texture_pts[0].y)*bc_screen[0] + (texture_pts[1].y)*bc_screen[1] + (texture_pts[2].y)*bc_screen[2])
                 );
-                image.set(P.x, P.y, color);
+                image.set(P.x, P.y, color*intensity);
             }
         }
     }
